@@ -1,0 +1,31 @@
+format: ChoreonoidBody
+formatVersion: 1.0
+name: Shore
+links:
+  -
+    name: Shore
+    jointType: fixed
+    material: Ground
+    AMOR: true
+    elements:
+      -
+        type: Transform
+        translation: [ -2.5, 0, -0.4 ]
+        elements:
+          Shape:
+            geometry:
+              type: Box
+              size: [ 5.0, 10.0, 0.8 ]
+            appearance: &Ground
+              material:
+                diffuseColor: [ 0, 0, 1 ]
+      -
+        type: Transform
+        translation: [ 0, 0, -0.9 ]
+        elements:
+          Shape:
+            geometry:
+              type: Box
+              size: [ 10.0, 10.0, 0.2 ]
+            appearance: *Ground
+

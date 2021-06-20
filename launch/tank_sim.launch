@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="choreonoid_ros" name="choreonoid" type="choreonoid"
+        args="$(find amphibious_choreonoid)/projects/tank_sim.cnoid" />
+</launch>

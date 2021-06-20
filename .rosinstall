@@ -1,0 +1,6 @@
+- git:
+    local-name: choreonoid
+    uri: https://github.com/choreonoid/choreonoid.git
+- git:
+    local-name: choreonoid_ros
+    uri: https://github.com/choreonoid/choreonoid_ros.git
