@@ -1,2 +1,4 @@
-# choreonoid_add_simple_controller(MyController MyController.cpp)
-# target_link_libraries(MyController ${roscpp_LIBRARIES})
+choreonoid_add_simple_controller(CameraController CameraController.cpp)
+target_link_libraries(CameraController ${roscpp_LIBRARIES} ${image_transport_LIBRARIES})
+
+choreonoid_add_simple_controller(TurretController TurretController.cpp)

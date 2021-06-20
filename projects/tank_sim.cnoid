@@ -69,8 +69,38 @@ items:
             location_editable: true
             scene_sensitive: true
             zmp: [ 0, 0, 0 ]
+          children: 
+            - 
+              id: 4
+              name: "CameraController"
+              plugin: Body
+              class: SimpleControllerItem
+              is_checked: true
+              data: 
+                isNoDelayMode: false
+                controllerOptions: ""
+                controller: "${HOME}/catkin_ws/agent_system_choreonoid/build/amphibious_choreonoid/lib/choreonoid-1.8/simplecontroller/CameraController"
+                baseDirectory: "None"
+                reloading: false
+                exportSymbols: false
+                isOldTargetVariableMode: false
+              children: 
+                - 
+                  id: 5
+                  name: "TurretController"
+                  plugin: Body
+                  class: SimpleControllerItem
+                  is_checked: true
+                  data: 
+                    isNoDelayMode: false
+                    controllerOptions: ""
+                    controller: "${HOME}/catkin_ws/agent_system_choreonoid/build/amphibious_choreonoid/lib/choreonoid-1.8/simplecontroller/TurretController"
+                    baseDirectory: "None"
+                    reloading: false
+                    exportSymbols: false
+                    isOldTargetVariableMode: false
         - 
-          id: 4
+          id: 6
           name: "FluidArea"
           plugin: FluidDynamics
           class: FluidAreaItem
@@ -91,7 +121,59 @@ items:
             viscosity: 0.001
             flow: [ 0, 0, 0 ]
         - 
-          id: 5
+          id: 7
+          name: "Box1"
+          plugin: Body
+          class: BodyItem
+          is_checked: true
+          data: 
+            file: "../models/box.body"
+            format: CHOREONOID-BODY
+            rootPosition: [ 2.5, 2.5, 0.2 ]
+            rootAttitude: [ 
+              1, 0, 0, 
+              0, 1, 0, 
+              0, 0, 1 ]
+            jointPositions: [  ]
+            initialRootPosition: [ 0, 0, 0 ]
+            initialRootAttitude: [ 
+              1, 0, 0, 
+              0, 1, 0, 
+              0, 0, 1 ]
+            staticModel: false
+            collisionDetection: true
+            selfCollisionDetection: false
+            location_editable: true
+            scene_sensitive: true
+            zmp: [ 0, 0, 0 ]
+        - 
+          id: 8
+          name: "Box2"
+          plugin: Body
+          class: BodyItem
+          is_checked: true
+          data: 
+            file: "../models/box.body"
+            format: CHOREONOID-BODY
+            rootPosition: [ -2.5, -2.5, 0.2 ]
+            rootAttitude: [ 
+              1, 0, 0, 
+              0, 1, 0, 
+              0, 0, 1 ]
+            jointPositions: [  ]
+            initialRootPosition: [ 0, 0, 0 ]
+            initialRootAttitude: [ 
+              1, 0, 0, 
+              0, 1, 0, 
+              0, 0, 1 ]
+            staticModel: false
+            collisionDetection: true
+            selfCollisionDetection: false
+            location_editable: true
+            scene_sensitive: true
+            zmp: [ 0, 0, 0 ]
+        - 
+          id: 9
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -124,13 +206,32 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 6
+              id: 10
               name: "FluidDynamicsSimulator"
               plugin: FluidDynamics
               class: FluidDynamicsSimulatorItem
               is_checked: true
               data: 
                 enabled: true
+            - 
+              id: 11
+              name: "GLVisionSimulator"
+              plugin: Body
+              class: GLVisionSimulatorItem
+              is_checked: true
+              data: 
+                enabled: true
+                maxFrameRate: 1000
+                maxLatency: 1
+                recordVisionData: false
+                threadMode: Sensor
+                bestEffort: false
+                allSceneObjects: false
+                rangeSensorPrecisionRatio: 2
+                depthError: 0
+                enableHeadLight: true
+                enableAdditionalLights: true
+                antiAliasing: false
 views: 
   - 
     id: 0
@@ -143,7 +244,7 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      expanded: [ 1, 5 ]
+      expanded: [ 1, 3, 4, 9 ]
   - 
     id: 2
     name: "Location"
@@ -345,6 +446,16 @@ Body:
         show_zmp: false
       - 
         bodyItem: 3
+        show_cm: false
+        show_cm_projection: false
+        show_zmp: false
+      - 
+        bodyItem: 7
+        show_cm: false
+        show_cm_projection: false
+        show_zmp: false
+      - 
+        bodyItem: 8
         show_cm: false
         show_cm_projection: false
         show_zmp: false

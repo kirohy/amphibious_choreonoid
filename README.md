@@ -17,6 +17,6 @@ sudo hairo-world-plugin/misc/script/install-requisites-ubuntu-18.04.sh
 
 - build
 ```
-catkin config --cmake-args -DBUILD_CHOREONOID_EXECUTABLE=OFF -DUSE_PYTHON3=OFF -DCMAKE_BUILD_TYPE=Release -DBUILD_HAIRO_WORLD_PLUGIN=ON
+catkin config --cmake-args -DBUILD_CHOREONOID_EXECUTABLE=OFF -DUSE_PYTHON3=OFF -DCMAKE_BUILD_TYPE=Release -DBUILD_HAIRO_WORLD_PLUGIN=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 catkin build
 ```

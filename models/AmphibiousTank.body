@@ -35,21 +35,21 @@ links:
   -
     name: FLOAT_BASE
     parent: CHASSIS
-    translation: [ -0.2, 0.0, 0.125]
-    mass: 1
+    translation: [ -0.15, 0.0, 0.125]
+    mass: 3.0
     inertia: [
       0.1, 0,   0,
       0,   0.1, 0,
       0,   0,   0.1 ]
     <<: *FluidParamsCommon
     density: 5000.0
-    surface: [ 0.055, 0.055, 0.0125, 0.0125, 0.015, 0.015 ]
+    surface: [ 0.055, 0.055, 0.02, 0.02, 0.03, 0.03 ]
     elements:
       -
         type: Shape
         geometry:
           type: Box
-          size: [ 0.05, 0.2, 0.15 ]
+          size: [ 0.1, 0.2, 0.15 ]
         appearance: *BodyAppearance
       -
         type: Transform
@@ -59,12 +59,12 @@ links:
             type: Shape
             geometry:
               type: Box
-              size: [ 0.05, 0.3, 0.05 ]
+              size: [ 0.1, 0.3, 0.05 ]
             appearance: *BodyAppearance
   -
     name: FLOAT_L
     parent: FLOAT_BASE
-    translation: [ 0.2, 0.25, 0.105 ]
+    translation: [ 0.15, 0.25, 0.105 ]
     mass: 0.3
     <<: *FluidParamsCommon
     density: 170.0
@@ -88,8 +88,8 @@ links:
               radius: 0.1
             appearance: &FloatAppearance
               material:
-                diffuseColor: [ 0.6, 0, 0 ]
-                specularColor: [ 0.8, 0.2, 0.2 ]
+                diffuseColor: [ 0.4, 0.4, 0.4 ]
+                specularColor: [ 0.4, 0.4, 0.4 ]
                 shininess: 0.6
           -
             type: Transform
@@ -118,7 +118,7 @@ links:
   -
     name: FLOAT_R
     parent: FLOAT_BASE
-    translation: [ 0.2, -0.25, 0.105 ]
+    translation: [ 0.15, -0.25, 0.105 ]
     mass: 0.3
     <<: *FluidParamsCommon
     density: 170.0
@@ -143,14 +143,14 @@ links:
   -
     name: TURRET_Y
     parent: CHASSIS
-    translation: [ -0.04, 0, 0.1 ]
+    translation: [ 0.1, 0, 0.15 ]
     jointType: revolute
     jointAxis: -Z
     jointRange: [ -30.0, 30.0 ]
     maxJointVelocity: 90
     jointId: 0
     centerOfMass: [ 0, 0, 0.025 ]
-    mass: 4.0
+    mass: 2.0
     inertia: [
       0.1, 0,   0,
       0,   0.1, 0,
@@ -162,7 +162,7 @@ links:
       Shape:
         geometry:
           type: Box
-          size: [ 0.2, 0.2, 0.1 ]
+          size: [ 0.15, 0.15, 0.2 ]
         appearance: *BodyAppearance
   -
     name: TURRET_P
@@ -181,7 +181,7 @@ links:
         # Turret
         type: RigidBody
         centerOfMass: [ 0, 0, 0 ]
-        mass: 3.0
+        mass: 2.0
         inertia: [
           0.1, 0,   0,
           0,   0.1, 0,
@@ -193,33 +193,33 @@ links:
               height: 0.1
               radius: 0.1
             appearance: *BodyAppearance
-      -
-        # Gun
-        type: Transform
-        translation: [ 0.2, 0, 0 ]
-        rotation: [ 0, 0, 1, 90 ]
-        elements:
-          RigidBody:
-            centerOfMass: [ 0, 0, 0 ]
-            mass: 1.0
-            inertia: [
-              0.01, 0,   0,
-              0,    0.1, 0,
-              0,    0,   0.1 ]
-            elements:
-              Shape:
-                geometry:
-                  type: Cylinder
-                  height: 0.2
-                  radius: 0.02
-                appearance: *BodyAppearance
+        #-
+        #  # Gun
+        #  type: Transform
+        #  translation: [ 0.2, 0, 0 ]
+        #  rotation: [ 0, 0, 1, 90 ]
+        #  elements:
+        #    RigidBody:
+        #      centerOfMass: [ 0, 0, 0 ]
+        #      mass: 1.0
+        #      inertia: [
+        #        0.01, 0,   0,
+        #        0,    0.1, 0,
+        #        0,    0,   0.1 ]
+        #      elements:
+        #        Shape:
+        #          geometry:
+        #            type: Cylinder
+        #            height: 0.2
+        #            radius: 0.02
+        #          appearance: *BodyAppearance
       -
         type: SpotLight
         name: Light
         translation: [ 0.08, 0, 0.1 ]
         direction: [ 1, 0, 0 ]
-        beamWidth: 36
-        cutOffAngle: 40
+        beamWidth: 50
+        cutOffAngle: 50
         cutOffExponent: 6
         attenuation: [ 1, 0, 0.01 ]
         elements:

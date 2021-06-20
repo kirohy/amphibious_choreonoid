@@ -1,0 +1,25 @@
+format: ChoreonoidBody
+formatVersion: 1.0
+name: Box
+links:
+  -
+    name: Box
+    jointType: free
+    mass: 0.5
+    inertia: [
+        0.0033, 0.0,    0.0,
+        0.0,    0.0033, 0.0,
+        0.0,    0.0,    0.0033 ]
+    cdw: 1.2
+    tw: 0.2
+    cv: 10.0
+    density: 500.0
+    surface: [ 0.04, 0.04, 0.04, 0.04, 0.04, 0.04 ]
+    elements:
+      Shape:
+        geometry:
+          type: Box
+          size: [ 0.2, 0.2, 0.2 ]
+        appearance:
+          material:
+            diffuseColor: [ 1.0, 0.0, 0.0 ]
