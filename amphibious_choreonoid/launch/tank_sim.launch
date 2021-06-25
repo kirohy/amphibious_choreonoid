@@ -4,4 +4,7 @@
   <node name="image_view" pkg="image_view" type="image_view" >
     <remap from="image" to="/amphibious_tank/camera/image" />
   </node>
+  <node name="calc_motions" pkg="amphibious_choreonoid_motions" type="calc_motions" output="screen">
+      <remap from="/image_raw" to="/amphibious_tank/camera/image" />
+  </node>
 </launch>

@@ -22,4 +22,4 @@ links:
           size: [ 0.2, 0.2, 0.2 ]
         appearance:
           material:
-            diffuseColor: [ 1.0, 0.0, 0.0 ]
+            diffuseColor: [ 1.0, 1.0, 1.0 ]
