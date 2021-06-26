@@ -119,6 +119,7 @@ catkin_package(
 set(CMAKE_CXX_STANDARD ${CHOREONOID_CXX_STANDARD})
 set(CMAKE_CXX_EXTENSIONS OFF)
 set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS ${CHOREONOID_COMPILE_DEFINITIONS})
+configure_file(${PROJECT_SOURCE_DIR}/projects/tank_sim.cnoid.in ${PROJECT_SOURCE_DIR}/projects/tank_sim.cnoid @ONLY)
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations

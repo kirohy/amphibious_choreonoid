@@ -67,7 +67,7 @@ links:
     translation: [ 0.15, 0.25, 0.105 ]
     mass: 0.3
     <<: *FluidParamsCommon
-    density: 170.0
+    density: 200.0
     surface: [ 0.0314, 0.0314, 0.1514, 0.1514, 0.1514, 0.1514 ]
     elements:
       -
@@ -110,18 +110,16 @@ links:
                   radius: 0.1
                 appearance: *FloatAppearance
       -
-        type: Transform
+        type: Thruster
+        name: Thruster_L
         translation: [ -0.3, 0.0, 0.0 ]
-        elements:
-          Thruster:
-            name: Thruster_L
   -
     name: FLOAT_R
     parent: FLOAT_BASE
     translation: [ 0.15, -0.25, 0.105 ]
     mass: 0.3
     <<: *FluidParamsCommon
-    density: 170.0
+    density: 200.0
     surface: [ 0.0314, 0.0314, 0.1514, 0.1514, 0.1514, 0.1514 ]
     elements:
       -
@@ -135,11 +133,9 @@ links:
           0,   0,   0.1 ]
         elements: *FloatShape
       -
-        type: Transform
+        type: Thruster
+        name: Thruster_R
         translation: [ -0.3, 0.0, 0.0 ]
-        elements:
-          Thruster:
-            name: Thruster_R
   -
     name: TURRET_Y
     parent: CHASSIS

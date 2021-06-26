@@ -1,25 +1,40 @@
 #include <cv_bridge/cv_bridge.h>
+#include <geometry_msgs/Twist.h>
 #include <image_transport/image_transport.h>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <ros/ros.h>
 #include <sensor_msgs/image_encodings.h>
 
-class ImageConverter {
+class CalcMotions {
   private:
     ros::NodeHandle nh_;
+    ros::Publisher vel_pub_;
+    ros::Timer timer_;
+    geometry_msgs::Twist vel_msg_;
     image_transport::ImageTransport it_;
     image_transport::Subscriber image_sub_;
     image_transport::Publisher image_pub_;
     cv_bridge::CvImagePtr cv_ptr_;
+    cv::Point2f target_;
 
   public:
-    ImageConverter() : it_(nh_) {
-        image_sub_ = it_.subscribe("/image_raw", 1, &ImageConverter::imageCb, this);
+    CalcMotions() : it_(nh_) {
+        vel_pub_ = nh_.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+        image_sub_ = it_.subscribe("/image_raw", 1, &CalcMotions::imageCb, this);
         image_pub_ = it_.advertise("/image_result", 1);
+
+        vel_msg_.linear.x = 0.0;
+        vel_msg_.linear.y = 0.0;
+        vel_msg_.linear.z = 0.0;
+        vel_msg_.angular.x = 0.0;
+        vel_msg_.angular.y = 0.0;
+        vel_msg_.angular.z = 0.0;
+        vel_pub_.publish(vel_msg_);
+        timer_ = nh_.createTimer(ros::Duration(0.01), &CalcMotions::timerCb, this);
     }
 
-    ~ImageConverter() {
+    ~CalcMotions() {
         cv::destroyAllWindows();
     }
 
@@ -57,22 +72,55 @@ class ImageConverter {
         }
 
         if (max_area_contour >= 0) {
-            cv::Point2f center;
             float radius;
-            cv::minEnclosingCircle(contours.at(max_area_contour), center, radius);
-            cv::circle(cv_ptr_->image, center, radius, cv::Scalar(0, 0, 255), 3, 4);
+            cv::minEnclosingCircle(contours.at(max_area_contour), target_, radius);
+            cv::circle(cv_ptr_->image, target_, radius, cv::Scalar(0, 0, 255), 3, 4);
+
+            if (target_.x < cv_ptr_->image.cols / 2 - 20) {
+                vel_msg_.linear.x = 0.0;
+                vel_msg_.linear.y = 0.0;
+                vel_msg_.linear.z = 0.0;
+                vel_msg_.angular.x = 0.0;
+                vel_msg_.angular.y = 0.0;
+                vel_msg_.angular.z = 1.0;
+            } else if (target_.x > cv_ptr_->image.cols / 2 + 20) {
+                vel_msg_.linear.x = 0.0;
+                vel_msg_.linear.y = 0.0;
+                vel_msg_.linear.z = 0.0;
+                vel_msg_.angular.x = 0.0;
+                vel_msg_.angular.y = 0.0;
+                vel_msg_.angular.z = -1.0;
+            } else {
+                vel_msg_.linear.x = 1.0;
+                vel_msg_.linear.y = 0.0;
+                vel_msg_.linear.z = 0.0;
+                vel_msg_.angular.x = 0.0;
+                vel_msg_.angular.y = 0.0;
+                vel_msg_.angular.z = 0.0;
+            }
 
             cv::imshow("Result Image", cv_ptr_->image);
             cv::waitKey(3);
 
             image_pub_.publish(cv_ptr_->toImageMsg());
+        } else {
+            vel_msg_.linear.x = 0.0;
+            vel_msg_.linear.y = 0.0;
+            vel_msg_.linear.z = 0.0;
+            vel_msg_.angular.x = 0.0;
+            vel_msg_.angular.y = 0.0;
+            vel_msg_.angular.z = 1.0;
         }
+    }
+
+    void timerCb(const ros::TimerEvent &) {
+        vel_pub_.publish(vel_msg_);
     }
 };
 
 int main(int argc, char **argv) {
     ros::init(argc, argv, "calc_motions");
-    ImageConverter ic;
+    CalcMotions ic;
     ros::spin();
     return 0;
 }
