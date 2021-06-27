@@ -1,0 +1,27 @@
+format: ChoreonoidBody
+formatVersion: 1.0
+name: Goal
+links:
+  -
+    name: Goal
+    jointType: fixed
+    elements:
+      Shape:
+        geometry:
+          type: Extrusion
+          crossSection: [
+            1.0, -1.0,
+            1.0, 1.0,
+            0.95, 1.0,
+            0.95, -0.95,
+            -0.95, -0.95,
+            -0.95, 1.0,
+            -1.0, 1.0,
+            -1.0, -1.0,
+            1.0, -1.0
+          ]
+          spine: [ 0, 0, 0.1, 0, 0, 0 ]
+        appearance:
+          material:
+            diffuseColor: [ 1.0, 0, 0 ]
+

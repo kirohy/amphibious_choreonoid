@@ -10,12 +10,12 @@ links:
     elements:
       -
         type: Transform
-        translation: [ -2.5, 0, -0.4 ]
+        translation: [ -4.5, 0, -0.4 ]
         elements:
           Shape:
             geometry:
               type: Box
-              size: [ 5.0, 10.0, 0.8 ]
+              size: [ 6.0, 15.0, 0.8 ]
             appearance: &Ground
               material:
                 diffuseColor: [ 0, 0, 1 ]
@@ -26,6 +26,21 @@ links:
           Shape:
             geometry:
               type: Box
-              size: [ 10.0, 10.0, 0.2 ]
+              size: [ 15.0, 15.0, 0.2 ]
             appearance: *Ground
 
+      -
+        type: Transform
+        translation: [ 1.0, 0.0, -0.8 ]
+        elements:
+          Shape:
+            geometry:
+              type: Extrusion
+              crossSection: [
+                2.5, 0.0,
+                2.5, -0.8,
+                -2.5, 0.0,
+                2.5, 0.0
+              ]
+              spine: [ 0, 7.5, 0, 0, -7.5, 0 ]
+            appearance: *Ground

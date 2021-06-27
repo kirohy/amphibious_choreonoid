@@ -48,16 +48,16 @@ items:
           class: BodyItem
           is_checked: true
           data: 
-            file: "../models/AmphibiousTank.body"
+            file: "../models/amphibious_tank.body"
             format: CHOREONOID-BODY
-            rootPosition: [ -2, 0, 0.12 ]
+            rootPosition: [ -4.0, 0, 0.12 ]
             rootAttitude: [ 
               1, 0, 0, 
               0, 1, 0, 
               0, 0, 1 ]
             jointDisplacements: [ 0, 0, 0, 0 ]
             jointPositions: [ 0, 0, 0, 0 ]
-            initialRootPosition: [ 0, 0, 0.12 ]
+            initialRootPosition: [ -4.0, 0, 0.12 ]
             initialRootAttitude: [ 
               1, 0, 0, 
               0, 1, 0, 
@@ -134,10 +134,10 @@ items:
           class: FluidAreaItem
           is_checked: true
           data: 
-            translation: [ 2.5, 0, -0.4 ]
+            translation: [ 0, 0, -0.5 ]
             rotation: [ 0, 0, 0 ]
             type: 0
-            size: [ 5, 10, 0.8 ]
+            size: [ 15.0, 15.0, 0.6 ]
             radius: 0.5
             height: 1
             diffuseColor: [ 0, 1, 1 ]
@@ -157,13 +157,13 @@ items:
           data: 
             file: "../models/box.body"
             format: CHOREONOID-BODY
-            rootPosition: [ 2.5, 2.5, 0.2 ]
+            rootPosition: [ 4.0, 4.0, 0.2 ]
             rootAttitude: [ 
               1, 0, 0, 
               0, 1, 0, 
               0, 0, 1 ]
             jointPositions: [  ]
-            initialRootPosition: [ 0, 0, 0 ]
+            initialRootPosition: [ 4.0, 4.0, 0.2 ]
             initialRootAttitude: [ 
               1, 0, 0, 
               0, 1, 0, 
@@ -183,13 +183,13 @@ items:
           data: 
             file: "../models/box.body"
             format: CHOREONOID-BODY
-            rootPosition: [ -2.5, -2.5, 0.2 ]
+            rootPosition: [ -4.0, -4.0, 0.2 ]
             rootAttitude: [ 
               1, 0, 0, 
               0, 1, 0, 
               0, 0, 1 ]
             jointPositions: [  ]
-            initialRootPosition: [ 0, 0, 0 ]
+            initialRootPosition: [ -4.0, -4.0, 0.2 ]
             initialRootAttitude: [ 
               1, 0, 0, 
               0, 1, 0, 
@@ -202,6 +202,32 @@ items:
             zmp: [ 0, 0, 0 ]
         - 
           id: 11
+          name: "Goal"
+          plugin: Body
+          class: BodyItem
+          is_checked: true
+          data: 
+            file: "../models/goal.body"
+            format: CHOREONOID-BODY
+            rootPosition: [ -6.5, 6.5, 0.0 ]
+            rootAttitude: [ 
+              -1, 0, 0, 
+              0, -1, 0, 
+              0, 0, 1 ]
+            jointPositions: [  ]
+            initialRootPosition: [ -6.5, 6.5, 0.0 ]
+            initialRootAttitude: [ 
+              -1, 0, 0, 
+              0, -1, 0, 
+              0, 0, 1 ]
+            staticModel: false
+            collisionDetection: true
+            selfCollisionDetection: false
+            location_editable: true
+            scene_sensitive: true
+            zmp: [ 0, 0, 0 ]
+        - 
+          id: 12
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -234,7 +260,7 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 12
+              id: 13
               name: "FluidDynamicsSimulator"
               plugin: FluidDynamics
               class: FluidDynamicsSimulatorItem
@@ -242,7 +268,7 @@ items:
               data: 
                 enabled: true
             - 
-              id: 13
+              id: 14
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -314,8 +340,8 @@ views:
       additionalLights: true
       fog: true
       floorGrid: true
-      floorGridSpan: 10
-      floorGridInterval: 0.5
+      floorGridSpan: 15
+      floorGridInterval: 0.75
       xzGridSpan: 10
       xzGridInterval: 0.5
       xzGrid: false

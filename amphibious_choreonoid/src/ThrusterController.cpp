@@ -47,13 +47,13 @@ class ThrustController : public cnoid::SimpleController {
         std::lock_guard<std::mutex> lock(cmd_mutex_);
         if (msg->angular.z > 0) {
             thuruster_force_[0] = 0.0;
-            thuruster_force_[1] = 10.0;
+            thuruster_force_[1] = 20.0;
         } else if (msg->angular.z < 0) {
-            thuruster_force_[0] = 10.0;
+            thuruster_force_[0] = 20.0;
             thuruster_force_[1] = 0.0;
         } else if (msg->linear.x > 0) {
-            thuruster_force_[0] = 5.0;
-            thuruster_force_[1] = 5.0;
+            thuruster_force_[0] = 10.0;
+            thuruster_force_[1] = 10.0;
         } else {
             thuruster_force_[0] = 0.0;
             thuruster_force_[1] = 0.0;
