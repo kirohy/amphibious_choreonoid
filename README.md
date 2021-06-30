@@ -11,7 +11,7 @@ sudo choreonoid/misc/script/install-requisites-ubuntu-18.04.sh
 - hairo plugin
 ```
 cd choreonoid/ext/
-git clone git@github.com:kirohy/hairo-world-plugin.git -b melodic
+git clone https://github.com/k38-suzuki/hairo-world-plugin.git
 sudo hairo-world-plugin/misc/script/install-requisites-ubuntu-18.04.sh
 ```
 
