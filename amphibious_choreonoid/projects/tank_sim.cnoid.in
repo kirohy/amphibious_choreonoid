@@ -127,8 +127,22 @@ items:
                     reloading: false
                     exportSymbols: false
                     isOldTargetVariableMode: false
+                - 
+                  id: 8
+                  name: "ArmController"
+                  plugin: Body
+                  class: SimpleControllerItem
+                  is_checked: true
+                  data: 
+                    isNoDelayMode: false
+                    controllerOptions: ""
+                    controller: "@PROJECT_BINARY_DIR@/lib/choreonoid-1.8/simplecontroller/ArmController"
+                    baseDirectory: "None"
+                    reloading: false
+                    exportSymbols: false
+                    isOldTargetVariableMode: false
         - 
-          id: 8
+          id: 9
           name: "FluidArea"
           plugin: FluidDynamics
           class: FluidAreaItem
@@ -149,7 +163,7 @@ items:
             viscosity: 0.001
             flow: [ 0, 0, 0 ]
         - 
-          id: 9
+          id: 10
           name: "Box1"
           plugin: Body
           class: BodyItem
@@ -175,7 +189,7 @@ items:
             scene_sensitive: true
             zmp: [ 0, 0, 0 ]
         - 
-          id: 10
+          id: 11
           name: "Box2"
           plugin: Body
           class: BodyItem
@@ -201,7 +215,7 @@ items:
             scene_sensitive: true
             zmp: [ 0, 0, 0 ]
         - 
-          id: 11
+          id: 12
           name: "Goal"
           plugin: Body
           class: BodyItem
@@ -227,7 +241,7 @@ items:
             scene_sensitive: true
             zmp: [ 0, 0, 0 ]
         - 
-          id: 12
+          id: 13
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -260,7 +274,7 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 13
+              id: 14
               name: "FluidDynamicsSimulator"
               plugin: FluidDynamics
               class: FluidDynamicsSimulatorItem
@@ -268,7 +282,7 @@ items:
               data: 
                 enabled: true
             - 
-              id: 14
+              id: 15
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem

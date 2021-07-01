@@ -26,116 +26,12 @@ links:
       Shape:
         geometry:
           type: Box
-          size: [ 0.45, 0.3, 0.1 ]
+          size: [ 0.45, 0.45, 0.1 ]
         appearance: &BodyAppearance
           material:
             diffuseColor: [ 0, 0.6, 0 ]
             specularColor: [ 0.2, 0.8, 0.2 ]
             shininess: 0.6
-  -
-    name: FLOAT_BASE
-    parent: CHASSIS
-    translation: [ -0.15, 0.0, 0.125]
-    mass: 3.0
-    inertia: [
-      0.1, 0,   0,
-      0,   0.1, 0,
-      0,   0,   0.1 ]
-    <<: *FluidParamsCommon
-    density: 5000.0
-    surface: [ 0.055, 0.055, 0.02, 0.02, 0.03, 0.03 ]
-    elements:
-      -
-        type: Shape
-        geometry:
-          type: Box
-          size: [ 0.1, 0.2, 0.15 ]
-        appearance: *BodyAppearance
-      -
-        type: Transform
-        translation: [ 0.0, 0.0, 0.1 ]
-        elements:
-          -
-            type: Shape
-            geometry:
-              type: Box
-              size: [ 0.1, 0.3, 0.05 ]
-            appearance: *BodyAppearance
-  -
-    name: FLOAT_L
-    parent: FLOAT_BASE
-    translation: [ 0.15, 0.25, 0.105 ]
-    mass: 0.3
-    <<: *FluidParamsCommon
-    density: 200.0
-    surface: [ 0.0314, 0.0314, 0.1514, 0.1514, 0.1514, 0.1514 ]
-    elements:
-      -
-        type: RigidBody
-        rotation: [ 0, 0, 1, 90 ]
-        centerOfMass: [ 0, 0, 0 ]
-        mass: 3.0
-        inertia: [
-          0.1, 0,   0,
-          0,   0.1, 0,
-          0,   0,   0.1 ]
-        elements: &FloatShape
-          -
-            type: Shape
-            geometry:
-              type: Cylinder
-              height: 0.6
-              radius: 0.1
-            appearance: &FloatAppearance
-              material:
-                diffuseColor: [ 0.4, 0.4, 0.4 ]
-                specularColor: [ 0.4, 0.4, 0.4 ]
-                shininess: 0.6
-          -
-            type: Transform
-            translation: [ 0, 0.3, 0 ]
-            elements:
-              Shape:
-                geometry:
-                  type: Sphere
-                  radius: 0.1
-                appearance: *FloatAppearance
-          -
-            type: Transform
-            translation: [ 0, -0.3, 0 ]
-            elements:
-              Shape:
-                geometry:
-                  type: Sphere
-                  radius: 0.1
-                appearance: *FloatAppearance
-      -
-        type: Thruster
-        name: Thruster_L
-        translation: [ -0.3, 0.0, 0.0 ]
-  -
-    name: FLOAT_R
-    parent: FLOAT_BASE
-    translation: [ 0.15, -0.25, 0.105 ]
-    mass: 0.3
-    <<: *FluidParamsCommon
-    density: 200.0
-    surface: [ 0.0314, 0.0314, 0.1514, 0.1514, 0.1514, 0.1514 ]
-    elements:
-      -
-        type: RigidBody
-        rotation: [ 0, 0, 1, 90 ]
-        centerOfMass: [ 0, 0, 0 ]
-        mass: 3.0
-        inertia: [
-          0.1, 0,   0,
-          0,   0.1, 0,
-          0,   0,   0.1 ]
-        elements: *FloatShape
-      -
-        type: Thruster
-        name: Thruster_R
-        translation: [ -0.3, 0.0, 0.0 ]
   -
     name: TURRET_Y
     parent: CHASSIS
@@ -166,7 +62,7 @@ links:
     translation: [ 0, 0, 0.05 ]
     jointType: revolute
     jointAxis: -Y
-    jointRange: [ -10, 45 ]
+    jointRange: [ -30, 45 ]
     maxJointVelocity: 90
     jointId: 1
     <<: *FluidParamsCommon
@@ -257,7 +153,7 @@ links:
   -
     name: TRACK_L
     parent: CHASSIS
-    translation: [ 0, 0.2, 0 ]
+    translation: [ 0, 0.275, 0 ]
     jointType: pseudo_continuous_track
     jointAxis: Y
     centerOfMass: [ 0, 0, 0 ]
@@ -301,7 +197,7 @@ links:
   -
     name: TRACK_R
     parent: CHASSIS
-    translation: [ 0, -0.2, 0 ]
+    translation: [ 0, -0.275, 0 ]
     jointType: pseudo_continuous_track
     jointAxis: Y
     centerOfMass: [ 0, 0, 0 ]
@@ -314,4 +210,198 @@ links:
     density: 2000.0
     surface: [ 0.03, 0.03, 0.1314, 0.1314, 0.105, 0.105 ]
     elements: *TrackShape
+  -
+    name: FLOAT_BASE
+    parent: CHASSIS
+    translation: [ -0.1, 0.0, 0.175 ]
+    mass: 3.0
+    inertia: [
+      0.1, 0,   0,
+      0,   0.1, 0,
+      0,   0,   0.1 ]
+    <<: *FluidParamsCommon
+    density: 5000.0
+    surface: [ 0.055, 0.055, 0.02, 0.02, 0.03, 0.03 ]
+    elements:
+      -
+        type: Shape
+        geometry:
+          type: Box
+          size: [ 0.1, 0.25, 0.25 ]
+        appearance: &BaseAppearance
+          material:
+            diffuseColor: [ 0.0, 0.3, 0.0 ]
+            # specularColor: [ 0.2, 0.8, 0.2 ]
+            # shininess: 0.2
+      -
+        type: Transform
+        translation: [ 0.0, 0.0, 0.15 ]
+        elements:
+          -
+            type: Shape
+            geometry:
+              type: Box
+              size: [ 0.1, 0.3, 0.05 ]
+            appearance: *BaseAppearance
+      -
+        type: Transform
+        translation: [ 0.1, 0.15, -0.05 ]
+        elements:
+          -
+            type: Shape
+            geometry:
+              type: Box
+              size: [ 0.4, 0.05, 0.20 ]
+            appearance: *BaseAppearance
+      -
+        type: Transform
+        translation: [ 0.1, -0.15, -0.05 ]
+        elements:
+          -
+            type: Shape
+            geometry:
+              type: Box
+              size: [ 0.4, 0.05, 0.20 ]
+            appearance: *BaseAppearance
+  -
+    name: ARM_L
+    parent: FLOAT_BASE
+    translation : [ 0.3, 0.2, -0.025 ]
+    centerOfMass: [ 0.3, 0, 0 ]
+    mass: 1.0
+    jointType: revolute
+    jointAxis: -Z
+    jointRange: [ -10.0, 190.0 ]
+    maxJointVelocity: 90
+    jointId: 2
+    mass: 0.5
+    inertia: [
+      0.1, 0.0, 0.0,
+      0.0, 0.1, 0.0,
+      0.0, 0.0, 0.1
+    ]
+    <<: *FluidParamsCommon
+    density: 5000.0
+    # surface: []
+    elements:
+      -
+        type: Transform
+        translation: [ -0.3, 0.0, 0.01 ]
+        elements: &ArmShape
+          -
+            type: Shape
+            geometry:
+              type: Box
+              size: [ 0.6, 0.05, 0.1 ]
+            appearance: *BaseAppearance
+          -
+            type: Transform
+            translation: [ -0.275, 0.1, 0.0 ]
+            elements:
+              -
+                type: Shape
+                geometry:
+                  type: Box
+                  size: [ 0.05, 0.15, 0.1 ]
+                appearance: *BaseAppearance
+  -
+    name: ARM_R
+    parent: FLOAT_BASE
+    translation : [ 0.3, -0.2, -0.025 ]
+    centerOfMass: [ 0.3, 0, 0 ]
+    jointType: revolute
+    jointAxis: Z
+    jointRange: [ -10.0, 190.0 ]
+    maxJointVelocity: 90
+    jointId: 3
+    mass: 0.5
+    inertia: [
+      0.1, 0.0, 0.0,
+      0.0, 0.1, 0.0,
+      0.0, 0.0, 0.1
+    ]
+    <<: *FluidParamsCommon
+    density: 5000.0
+    # surface: []
+    elements:
+      -
+        type: Transform
+        translation: [ -0.3, 0.0, 0.01 ]
+        rotation: [ 1, 0, 0, 180 ]
+        elements: *ArmShape
+  -
+    name: FLOAT_L
+    parent: FLOAT_BASE
+    translation: [ 0.15, 0.25, 0.15 ]
+    mass: 0.3
+    <<: *FluidParamsCommon
+    density: 200.0
+    surface: [ 0.0314, 0.0314, 0.1514, 0.1514, 0.1514, 0.1514 ]
+    elements:
+      -
+        type: RigidBody
+        rotation: [ 0, 0, 1, 90 ]
+        centerOfMass: [ 0, 0, 0 ]
+        mass: 3.0
+        inertia: [
+          0.1, 0,   0,
+          0,   0.1, 0,
+          0,   0,   0.1 ]
+        elements: &FloatShape
+          -
+            type: Shape
+            geometry:
+              type: Cylinder
+              height: 0.6
+              radius: 0.1
+            appearance: &FloatAppearance
+              material:
+                diffuseColor: [ 0.4, 0.4, 0.4 ]
+                specularColor: [ 0.4, 0.4, 0.4 ]
+                shininess: 0.6
+          -
+            type: Transform
+            translation: [ 0, 0.3, 0 ]
+            elements:
+              Shape:
+                geometry:
+                  type: Sphere
+                  radius: 0.1
+                appearance: *FloatAppearance
+          -
+            type: Transform
+            translation: [ 0, -0.3, 0 ]
+            elements:
+              Shape:
+                geometry:
+                  type: Sphere
+                  radius: 0.1
+                appearance: *FloatAppearance
+      -
+        type: Thruster
+        name: Thruster_L
+        translation: [ -0.3, 0.0, 0.0 ]
+  -
+    name: FLOAT_R
+    parent: FLOAT_BASE
+    translation: [ 0.15, -0.25, 0.15 ]
+    mass: 0.3
+    <<: *FluidParamsCommon
+    density: 200.0
+    surface: [ 0.0314, 0.0314, 0.1514, 0.1514, 0.1514, 0.1514 ]
+    elements:
+      -
+        type: RigidBody
+        rotation: [ 0, 0, 1, 90 ]
+        centerOfMass: [ 0, 0, 0 ]
+        mass: 3.0
+        inertia: [
+          0.1, 0,   0,
+          0,   0.1, 0,
+          0,   0,   0.1 ]
+        elements: *FloatShape
+      -
+        type: Thruster
+        name: Thruster_R
+        translation: [ -0.3, 0.0, 0.0 ]
 

@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   image_transport
   choreonoid
+  amphibious_choreonoid_motions
 )
 
 ## System dependencies are found with CMake's conventions

@@ -1,3 +1,4 @@
+#include <amphibious_choreonoid_motions/machine_state.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <geometry_msgs/Twist.h>
 #include <image_transport/image_transport.h>
@@ -10,6 +11,7 @@ class CalcMotions {
   private:
     ros::NodeHandle nh_;
     ros::Publisher vel_pub_;
+    ros::Publisher state_pub_;
     ros::Timer timer_;
     geometry_msgs::Twist vel_msg_;
     image_transport::ImageTransport it_;
@@ -17,10 +19,12 @@ class CalcMotions {
     image_transport::Publisher image_pub_;
     cv_bridge::CvImagePtr cv_ptr_;
     cv::Point2f target_;
+    MachineState::StateTransition state_;
 
   public:
     CalcMotions() : it_(nh_) {
         vel_pub_ = nh_.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+        state_pub_ = nh_.advertise<std_msgs::Int32>("/machine_state", 1);
         image_sub_ = it_.subscribe("/image_raw", 1, &CalcMotions::imageCb, this);
         image_pub_ = it_.advertise("/image_result", 1);
 
@@ -76,28 +80,42 @@ class CalcMotions {
             cv::minEnclosingCircle(contours.at(max_area_contour), target_, radius);
             cv::circle(cv_ptr_->image, target_, radius, cv::Scalar(0, 0, 255), 3, 4);
 
-            if (target_.x < cv_ptr_->image.cols / 2 - 20) {
+            if (state_.current() == MachineState::State::SEARCH_OBJ) {
+                if (target_.x < cv_ptr_->image.cols / 2 - 20) {
+                    vel_msg_.linear.x = 0.0;
+                    vel_msg_.linear.y = 0.0;
+                    vel_msg_.linear.z = 0.0;
+                    vel_msg_.angular.x = 0.0;
+                    vel_msg_.angular.y = 0.0;
+                    vel_msg_.angular.z = 1.0;
+                } else if (target_.x > cv_ptr_->image.cols / 2 + 20) {
+                    vel_msg_.linear.x = 0.0;
+                    vel_msg_.linear.y = 0.0;
+                    vel_msg_.linear.z = 0.0;
+                    vel_msg_.angular.x = 0.0;
+                    vel_msg_.angular.y = 0.0;
+                    vel_msg_.angular.z = -1.0;
+                } else {
+                    vel_msg_.linear.x = 1.0;
+                    vel_msg_.linear.y = 0.0;
+                    vel_msg_.linear.z = 0.0;
+                    vel_msg_.angular.x = 0.0;
+                    vel_msg_.angular.y = 0.0;
+                    vel_msg_.angular.z = 0.0;
+                }
+                if (max_area > cv_ptr_->image.cols * cv_ptr_->image.rows * 0.6) {
+                    state_.set_next(MachineState::State::HOLDING_OBJ);
+                }
+            } else if (state_.current() == MachineState::State::HOLDING_OBJ) {
                 vel_msg_.linear.x = 0.0;
-                vel_msg_.linear.y = 0.0;
-                vel_msg_.linear.z = 0.0;
-                vel_msg_.angular.x = 0.0;
-                vel_msg_.angular.y = 0.0;
-                vel_msg_.angular.z = 1.0;
-            } else if (target_.x > cv_ptr_->image.cols / 2 + 20) {
-                vel_msg_.linear.x = 0.0;
-                vel_msg_.linear.y = 0.0;
-                vel_msg_.linear.z = 0.0;
-                vel_msg_.angular.x = 0.0;
-                vel_msg_.angular.y = 0.0;
-                vel_msg_.angular.z = -1.0;
-            } else {
-                vel_msg_.linear.x = 1.0;
                 vel_msg_.linear.y = 0.0;
                 vel_msg_.linear.z = 0.0;
                 vel_msg_.angular.x = 0.0;
                 vel_msg_.angular.y = 0.0;
                 vel_msg_.angular.z = 0.0;
             }
+
+            state_.transition();
 
             cv::imshow("Result Image", cv_ptr_->image);
             cv::waitKey(3);
@@ -115,12 +133,13 @@ class CalcMotions {
 
     void timerCb(const ros::TimerEvent &) {
         vel_pub_.publish(vel_msg_);
+        state_pub_.publish(state_.current_as_msg());
     }
 };
 
 int main(int argc, char **argv) {
     ros::init(argc, argv, "calc_motions");
-    CalcMotions ic;
+    CalcMotions cm;
     ros::spin();
     return 0;
 }

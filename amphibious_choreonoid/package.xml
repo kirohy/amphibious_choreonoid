@@ -7,7 +7,7 @@
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="tork@todo.todo">tork</maintainer>
+  <maintainer email="yoshioka@jsk.t.u-tokyo.ac.jp">kirohy</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
@@ -51,9 +51,11 @@
   <buildtool_depend>catkin</buildtool_depend>
   <depend>choreonoid</depend>
   <depend>choreonoid_ros</depend>
+  <depend>roscpp</depend>
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>image_transport</depend>
+  <depend>amphibious_choreonoid_motions</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

@@ -5,4 +5,4 @@ ColumnLimit: 0
 IndentWidth: 4
 UseTab: Never
 MaxEmptyLinesToKeep: 2
-
+NamespaceIndentation: All
