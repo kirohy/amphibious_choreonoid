@@ -43,19 +43,10 @@ class TrackController : public cnoid::SimpleController {
 
     void motionsCb(const geometry_msgs::TwistConstPtr msg) {
         std::lock_guard<std::mutex> lock(cmd_mutex_);
-        if (msg->angular.z > 0) {
-            track_vel_[0] = -1.0;
-            track_vel_[1] = 1.0;
-        } else if (msg->angular.z < 0) {
-            track_vel_[0] = 1.0;
-            track_vel_[1] = -1.0;
-        } else if (msg->linear.x > 0) {
-            track_vel_[0] = 1.0;
-            track_vel_[1] = 1.0;
-        } else {
-            track_vel_[0] = 0.0;
-            track_vel_[1] = 0.0;
-        }
+        double x = msg->linear.x;
+        double z = msg->angular.z;
+        track_vel_[0] = x - z;
+        track_vel_[1] = x + z;
     }
 };
 

@@ -3,6 +3,7 @@
         args="$(find amphibious_choreonoid)/projects/tank_sim.cnoid" />
   <group ns="AmphibiousTank">
     <node name="calc_motions" pkg="amphibious_choreonoid_motions" type="calc_motions" output="screen">
+      <rosparam command="load" file="$(find amphibious_choreonoid_motions)/config/params.yaml" />
       <remap from="image_raw" to="camera/image" />
       <remap from="image_result" to="camera/image_result" />
     </node>
