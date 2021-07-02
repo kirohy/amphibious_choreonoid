@@ -10,14 +10,12 @@ class CameraController : public cnoid::SimpleController {
     cnoid::ScopedConnection cam_connection_;
     std::unique_ptr<ros::NodeHandle> nh_;
     image_transport::Publisher image_pub_;
-    double time_;
-    double time_step_;
 
   public:
     virtual bool configure(cnoid::SimpleControllerConfig *config) override {
-        nh_.reset(new ros::NodeHandle);
+        nh_.reset(new ros::NodeHandle(config->body()->name()));
         image_transport::ImageTransport imageTransport(*nh_);
-        image_pub_ = imageTransport.advertise("/amphibious_tank/camera/image", 1);
+        image_pub_ = imageTransport.advertise("camera/image", 1);
         return true;
     }
 
@@ -28,20 +26,16 @@ class CameraController : public cnoid::SimpleController {
 
         cam_connection_ = cam_->sigStateChanged().connect([&]() { publishCameraImage(); });
 
-        time_ = 0.0;
-        time_step_ = io->timeStep();
-
         return true;
     }
 
     virtual bool control() override {
-        time_ += time_step_;
         return true;
     }
 
     void publishCameraImage() {
         sensor_msgs::Image rosImage;
-        rosImage.header.stamp.fromSec(time_);
+        rosImage.header.stamp = ros::Time::now();
         rosImage.header.frame_id = cam_->name();
         auto &srcImage = cam_->image();
         rosImage.height = srcImage.height();

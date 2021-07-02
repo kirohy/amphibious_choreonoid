@@ -15,8 +15,8 @@ class ThrustController : public cnoid::SimpleController {
 
   public:
     virtual bool configure(cnoid::SimpleControllerConfig *config) override {
-        nh_.reset(new ros::NodeHandle);
-        vel_sub_ = nh_->subscribe("/cmd_vel", 1, &ThrustController::motionsCb, this);
+        nh_.reset(new ros::NodeHandle(config->body()->name()));
+        vel_sub_ = nh_->subscribe("cmd_vel", 1, &ThrustController::motionsCb, this);
         return true;
     }
 

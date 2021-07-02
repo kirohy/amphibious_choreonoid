@@ -1,7 +1,6 @@
 #include <amphibious_choreonoid_motions/machine_state.hpp>
 #include <cnoid/MathUtil>
 #include <cnoid/SimpleController>
-#include <memory>
 #include <ros/ros.h>
 #include <std_msgs/Int32.h>
 
@@ -17,8 +16,8 @@ class ArmController : public cnoid::SimpleController {
 
   public:
     virtual bool configure(cnoid::SimpleControllerConfig *config) override {
-        nh_.reset(new ros::NodeHandle);
-        state_sub_ = nh_->subscribe("/machine_state", 1, &ArmController::stateCb, this);
+        nh_.reset(new ros::NodeHandle(config->body()->name()));
+        state_sub_ = nh_->subscribe("machine_state", 1, &ArmController::stateCb, this);
         return true;
     }
 
@@ -53,7 +52,7 @@ class ArmController : public cnoid::SimpleController {
         return true;
     }
 
-    void stateCb(const std_msgs::Int32Ptr msg) {
+    void stateCb(const std_msgs::Int32Ptr& msg) {
         using namespace MachineState;
         auto recv_state = from_msg(msg);
         if (recv_state == State::HOLDING_OBJ || recv_state == State::CARRY_OBJ || recv_state == State::INTO_GOAL) {

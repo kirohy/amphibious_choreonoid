@@ -12,6 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   sensor_msgs
   image_transport
+  tf2
+  tf2_ros
   choreonoid
   amphibious_choreonoid_motions
 )

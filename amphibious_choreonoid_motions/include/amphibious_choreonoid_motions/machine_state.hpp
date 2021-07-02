@@ -41,7 +41,7 @@ namespace MachineState {
 
     State from_int(int state_int);
 
-    State from_msg(const std_msgs::Int32ConstPtr msg);
+    State from_msg(const std_msgs::Int32ConstPtr& msg);
 } // namespace MachineState
 
 #endif // MACHINE_STATE_HPP

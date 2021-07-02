@@ -23,10 +23,10 @@ class CalcMotions {
 
   public:
     CalcMotions() : it_(nh_) {
-        vel_pub_ = nh_.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
-        state_pub_ = nh_.advertise<std_msgs::Int32>("/machine_state", 1);
-        image_sub_ = it_.subscribe("/image_raw", 1, &CalcMotions::imageCb, this);
-        image_pub_ = it_.advertise("/image_result", 1);
+        vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+        state_pub_ = nh_.advertise<std_msgs::Int32>("machine_state", 1);
+        image_sub_ = it_.subscribe("image_raw", 1, &CalcMotions::imageCb, this);
+        image_pub_ = it_.advertise("image_result", 1);
 
         vel_msg_.linear.x = 0.0;
         vel_msg_.linear.y = 0.0;
@@ -116,11 +116,6 @@ class CalcMotions {
             }
 
             state_.transition();
-
-            cv::imshow("Result Image", cv_ptr_->image);
-            cv::waitKey(3);
-
-            image_pub_.publish(cv_ptr_->toImageMsg());
         } else {
             vel_msg_.linear.x = 0.0;
             vel_msg_.linear.y = 0.0;
@@ -129,6 +124,8 @@ class CalcMotions {
             vel_msg_.angular.y = 0.0;
             vel_msg_.angular.z = 1.0;
         }
+
+        image_pub_.publish(cv_ptr_->toImageMsg());
     }
 
     void timerCb(const ros::TimerEvent &) {

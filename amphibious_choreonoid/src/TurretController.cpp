@@ -1,8 +1,14 @@
 #include <cnoid/MathUtil>
 #include <cnoid/SimpleController>
+#include <geometry_msgs/PoseStamped.h>
+#include <ros/ros.h>
+#include <tf2_ros/transform_listener.h>
 
 class TurretController : public cnoid::SimpleController {
   private:
+    std::unique_ptr<ros::NodeHandle> nh_;
+    tf2_ros::Buffer tf_buf_;
+    tf2_ros::TransformListener tf_listener_;
     cnoid::BodyPtr body_;
     cnoid::LinkPtr joints_[2];
     double q_ref_[2];
@@ -10,6 +16,13 @@ class TurretController : public cnoid::SimpleController {
     double dt_;
 
   public:
+    TurretController() : tf_listener_(tf_buf_){};
+
+    virtual bool configure(cnoid::SimpleControllerConfig *config) override {
+        nh_.reset(new ros::NodeHandle(config->body()->name()));
+        return true;
+    }
+
     virtual bool initialize(cnoid::SimpleControllerIO *io) override {
         body_ = io->body();
         joints_[0] = body_->link("TURRET_Y");
@@ -31,8 +44,15 @@ class TurretController : public cnoid::SimpleController {
         static const double P = 200.0;
         static const double D = 50.0;
 
-        auto pos = body_->rootLink()->T();
-        auto pos_z = pos.translation().z();
+        geometry_msgs::TransformStamped tf_stamped;
+        try {
+            tf_stamped = tf_buf_.lookupTransform("world", "base_link", ros::Time(0));
+        } catch (tf2::TransformException &ex) {
+            ROS_WARN("%s", ex.what());
+            return true;
+        }
+
+        auto pos_z = tf_stamped.transform.translation.z;
 
         if (pos_z > 0) {
             q_ref_[1] = cnoid::radian(-15.0);

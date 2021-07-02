@@ -71,7 +71,7 @@ namespace MachineState {
         return res;
     }
 
-    State from_msg(const std_msgs::Int32ConstPtr msg) {
+    State from_msg(const std_msgs::Int32ConstPtr& msg) {
         return from_int(msg->data);
     }
 } // namespace MachineState
