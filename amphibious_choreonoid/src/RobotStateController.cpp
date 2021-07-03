@@ -8,16 +8,19 @@
 class RobotStateController : public cnoid::SimpleController {
   private:
     std::unique_ptr<ros::NodeHandle> nh_;
+    std::unique_ptr<ros::NodeHandle> pnh_;
     ros::Timer timer_;
     ros::Publisher joint_state_pub_;
     sensor_msgs::JointState joint_state_;
-    tf2_ros::StaticTransformBroadcaster goal_tf_pub_;
+    tf2_ros::StaticTransformBroadcaster static_tf_pub_;
     tf2_ros::TransformBroadcaster odom_pub_;
     cnoid::BodyPtr body_;
 
   public:
     virtual bool configure(cnoid::SimpleControllerConfig *config) override {
         nh_.reset(new ros::NodeHandle(config->body()->name()));
+        pnh_.reset(new ros::NodeHandle("~"));
+
         joint_state_pub_ = nh_->advertise<sensor_msgs::JointState>("joint_state", 1);
 
         return true;
@@ -39,34 +42,54 @@ class RobotStateController : public cnoid::SimpleController {
             joint_state_.name[i] = joint->name();
         }
 
-        geometry_msgs::TransformStamped goal;
-        goal.header.stamp = ros::Time::now();
-        goal.header.frame_id = "world";
-        goal.child_frame_id = "goal";
-        goal.transform.translation.x = -6.5;
-        goal.transform.translation.y = 6.5;
-        goal.transform.translation.z = 0.0;
+        XmlRpc::XmlRpcValue goal_pos;
+        XmlRpc::XmlRpcValue goal_front_pos;
+        pnh_->getParam("goal", goal_pos);
+        pnh_->getParam("goal_front", goal_front_pos);
+
+        geometry_msgs::TransformStamped static_tf;
+        auto start_time = ros::Time::now();
+
+        static_tf.header.stamp = start_time;
+        static_tf.header.frame_id = "world";
+        static_tf.child_frame_id = "goal";
+        static_tf.transform.translation.x = goal_pos["x"];
+        static_tf.transform.translation.y = goal_pos["y"];
+        static_tf.transform.translation.z = 0.0;
         tf2::Quaternion quat;
         quat.setRPY(0.0, 0.0, 0.0);
-        goal.transform.rotation.x = quat.x();
-        goal.transform.rotation.y = quat.y();
-        goal.transform.rotation.z = quat.z();
-        goal.transform.rotation.w = quat.w();
-        goal_tf_pub_.sendTransform(goal);
+        static_tf.transform.rotation.x = quat.x();
+        static_tf.transform.rotation.y = quat.y();
+        static_tf.transform.rotation.z = quat.z();
+        static_tf.transform.rotation.w = quat.w();
+        static_tf_pub_.sendTransform(static_tf);
 
-        geometry_msgs::TransformStamped goal_front;
-        goal_front.header.stamp = ros::Time::now();
-        goal_front.header.frame_id = "world";
-        goal_front.child_frame_id = "goal_front";
-        goal_front.transform.translation.x = -6.5;
-        goal_front.transform.translation.y = 4.5;
-        goal_front.transform.translation.z = 0.0;
+        static_tf.header.stamp = start_time;
+        static_tf.header.frame_id = "world";
+        static_tf.child_frame_id = "goal_front";
+        static_tf.transform.translation.x = goal_front_pos["x"];
+        static_tf.transform.translation.y = goal_front_pos["y"];
+        static_tf.transform.translation.z = 0.0;
         quat.setRPY(0.0, 0.0, 0.0);
-        goal_front.transform.rotation.x = quat.x();
-        goal_front.transform.rotation.y = quat.y();
-        goal_front.transform.rotation.z = quat.z();
-        goal_front.transform.rotation.w = quat.w();
-        goal_tf_pub_.sendTransform(goal_front);
+        static_tf.transform.rotation.x = quat.x();
+        static_tf.transform.rotation.y = quat.y();
+        static_tf.transform.rotation.z = quat.z();
+        static_tf.transform.rotation.w = quat.w();
+        static_tf_pub_.sendTransform(static_tf);
+
+        auto pos = body_->rootLink()->T();
+        Eigen::Quaterniond quat_robot(pos.rotation());
+        static_tf.header.stamp = start_time;
+        static_tf.header.frame_id = "world";
+        static_tf.child_frame_id = "initial_position";
+        static_tf.transform.translation.x = pos.translation().x();
+        static_tf.transform.translation.y = pos.translation().y();
+        static_tf.transform.translation.z = pos.translation().z();
+        static_tf.transform.rotation.x = quat_robot.x();
+        static_tf.transform.rotation.y = quat_robot.y();
+        static_tf.transform.rotation.z = quat_robot.z();
+        static_tf.transform.rotation.w = quat_robot.w();
+        static_tf_pub_.sendTransform(static_tf);
 
         timer_ = nh_->createTimer(ros::Duration(0.01), &RobotStateController::timer_callback, this);
 

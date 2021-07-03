@@ -85,26 +85,6 @@ links:
               height: 0.1
               radius: 0.1
             appearance: *BodyAppearance
-        #-
-        #  # Gun
-        #  type: Transform
-        #  translation: [ 0.2, 0, 0 ]
-        #  rotation: [ 0, 0, 1, 90 ]
-        #  elements:
-        #    RigidBody:
-        #      centerOfMass: [ 0, 0, 0 ]
-        #      mass: 1.0
-        #      inertia: [
-        #        0.01, 0,   0,
-        #        0,    0.1, 0,
-        #        0,    0,   0.1 ]
-        #      elements:
-        #        Shape:
-        #          geometry:
-        #            type: Cylinder
-        #            height: 0.2
-        #            radius: 0.02
-        #          appearance: *BodyAppearance
       -
         type: SpotLight
         name: Light
@@ -214,7 +194,7 @@ links:
     name: FLOAT_BASE
     parent: CHASSIS
     translation: [ -0.1, 0.0, 0.175 ]
-    mass: 3.0
+    mass: 5.0
     inertia: [
       0.1, 0,   0,
       0,   0.1, 0,
@@ -314,7 +294,7 @@ links:
     jointRange: [ -10.0, 190.0 ]
     maxJointVelocity: 90
     jointId: 3
-    mass: 0.5
+    mass: 1.0
     inertia: [
       0.1, 0.0, 0.0,
       0.0, 0.1, 0.0,

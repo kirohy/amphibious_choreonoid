@@ -4,12 +4,10 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/Twist.h>
 #include <image_transport/image_transport.h>
-#include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <ros/ros.h>
 #include <sensor_msgs/image_encodings.h>
 #include <string>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_listener.h>
 
@@ -45,7 +43,7 @@ class CalcMotions {
     CalcMotions() : pnh_("~"), it_(nh_), tf_listener_(tf_buf_) {
         vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
         state_pub_ = nh_.advertise<std_msgs::Int32>("machine_state", 1);
-        image_sub_ = it_.subscribe("image_raw", 1, &CalcMotions::imageCb, this);
+        image_sub_ = it_.subscribe("image_raw", 1, &CalcMotions::image_callback, this);
         image_pub_ = it_.advertise("image_result", 1);
 
         pnh_.param("freq", freq_, 100);
@@ -66,14 +64,12 @@ class CalcMotions {
         vel_msg_.angular.z = 0.0;
         vel_pub_.publish(vel_msg_);
 
-        timer_ = nh_.createTimer(ros::Duration(dt_), &CalcMotions::timerCb, this);
+        timer_ = nh_.createTimer(ros::Duration(dt_), &CalcMotions::timer_callback, this);
     }
 
-    ~CalcMotions() {
-        cv::destroyAllWindows();
-    }
+    ~CalcMotions() {}
 
-    void imageCb(const sensor_msgs::ImageConstPtr &msg) {
+    void image_callback(const sensor_msgs::ImageConstPtr &msg) {
         try {
             cv_ptr_ = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
         } catch (cv_bridge::Exception &e) {
@@ -84,7 +80,7 @@ class CalcMotions {
         cv::Mat hsv_image, color_mask, gray_image, bin_image, cv_image2;
         cv::cvtColor(cv_ptr_->image, hsv_image, CV_BGR2HSV);
 
-        cv::inRange(hsv_image, cv::Scalar(0, 0, 100, 0), cv::Scalar(180, 45, 255, 0), color_mask);
+        cv::inRange(hsv_image, cv::Scalar(0, 0, 100, 0), cv::Scalar(180, 45, 255, 0), color_mask); // detect white
 
         cv::bitwise_and(cv_ptr_->image, cv_ptr_->image, cv_image2, color_mask);
         cv::cvtColor(cv_image2, gray_image, CV_BGR2GRAY);
@@ -142,7 +138,7 @@ class CalcMotions {
         image_pub_.publish(cv_ptr_->toImageMsg());
     }
 
-    void timerCb(const ros::TimerEvent &) {
+    void timer_callback(const ros::TimerEvent &) {
         using namespace MachineState;
         if (state_.current() == State::HOLDING_OBJ && state_.prev() == State::SEARCH_OBJ) {
             clock_ = ros::Time::now();
@@ -163,26 +159,7 @@ class CalcMotions {
         } else if (state_.current() == State::EXIT_GOAL) {
             calc_vel(std::string("goal_front"), State::PREPARE, false);
         } else if (state_.current() == State::PREPARE) {
-            geometry_msgs::TransformStamped tf_robot;
-            tf2::Stamped<tf2::Transform> tf_tmp;
-            try {
-                tf_robot = tf_buf_.lookupTransform("world", "base_link", ros::Time(0));
-            } catch (tf2::TransformException &ex) {
-                ROS_WARN("%s", ex.what());
-            }
-            double roll, pitch, yaw;
-            tf2::fromMsg(tf_robot, tf_tmp);
-            tf2::Quaternion q = tf_tmp.getRotation();
-            tf2::Matrix3x3(q).getEulerYPR(yaw, pitch, roll);
-            if (abs(yaw + M_PI / 2) < 0.1) {
-                state_.set_next(State::SEARCH_OBJ);
-            }
-            vel_msg_.linear.x = 0.0;
-            vel_msg_.linear.y = 0.0;
-            vel_msg_.linear.z = 0.0;
-            vel_msg_.angular.x = 0.0;
-            vel_msg_.angular.y = 0.0;
-            vel_msg_.angular.z = offset_vel_angular_;
+            calc_vel(std::string("initial_position"), State::SEARCH_OBJ, true);
         }
         state_.transition();
         vel_pub_.publish(vel_msg_);

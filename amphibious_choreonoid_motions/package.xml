@@ -56,7 +56,7 @@
   <depend>cv_bridge</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
-  <depend>OpenCV</depend>
+  <depend>opencv2</depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

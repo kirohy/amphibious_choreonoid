@@ -1,9 +1,11 @@
 <launch>
   <node pkg="choreonoid_ros" name="choreonoid" type="choreonoid"
-        args="$(find amphibious_choreonoid)/projects/tank_sim.cnoid" />
+        args="$(find amphibious_choreonoid)/projects/tank_sim.cnoid">
+    <rosparam command="load" file="$(find amphibious_choreonoid)/config/field.yaml" />
+  </node>
   <group ns="AmphibiousTank">
     <node name="calc_motions" pkg="amphibious_choreonoid_motions" type="calc_motions" output="screen">
-      <rosparam command="load" file="$(find amphibious_choreonoid_motions)/config/params.yaml" />
+      <rosparam command="load" file="$(find amphibious_choreonoid_motions)/config/amphibious_tank.yaml" />
       <remap from="image_raw" to="camera/image" />
       <remap from="image_result" to="camera/image_result" />
     </node>
