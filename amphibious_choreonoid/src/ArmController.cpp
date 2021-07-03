@@ -52,12 +52,15 @@ class ArmController : public cnoid::SimpleController {
         return true;
     }
 
-    void stateCb(const std_msgs::Int32Ptr& msg) {
+    void stateCb(const std_msgs::Int32Ptr &msg) {
         using namespace MachineState;
         auto recv_state = from_msg(msg);
         if (recv_state == State::HOLDING_OBJ || recv_state == State::CARRY_OBJ || recv_state == State::INTO_GOAL) {
             q_ref_[0] = cnoid::radian(180.0);
             q_ref_[1] = cnoid::radian(180.0);
+        } else if (recv_state == State::RELEASE_OBJ || recv_state == State::EXIT_GOAL || recv_state == State::SEARCH_OBJ) {
+            q_ref_[0] = cnoid::radian(0.0);
+            q_ref_[1] = cnoid::radian(0.0);
         }
     }
 };

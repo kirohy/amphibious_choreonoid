@@ -1,11 +1,17 @@
 #include <amphibious_choreonoid_motions/machine_state.hpp>
+#include <cmath>
 #include <cv_bridge/cv_bridge.h>
+#include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/Twist.h>
 #include <image_transport/image_transport.h>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <ros/ros.h>
 #include <sensor_msgs/image_encodings.h>
+#include <string>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
 
 class CalcMotions {
   private:
@@ -14,6 +20,7 @@ class CalcMotions {
     ros::Publisher vel_pub_;
     ros::Publisher state_pub_;
     ros::Timer timer_;
+    ros::Time clock_;
     geometry_msgs::Twist vel_msg_;
     image_transport::ImageTransport it_;
     image_transport::Subscriber image_sub_;
@@ -21,6 +28,8 @@ class CalcMotions {
     cv_bridge::CvImagePtr cv_ptr_;
     cv::Point2f target_;
     cv::Point2f target_prev_;
+    tf2_ros::Buffer tf_buf_;
+    tf2_ros::TransformListener tf_listener_;
     MachineState::StateTransition state_;
     int freq_;
     int fps_;
@@ -33,7 +42,7 @@ class CalcMotions {
     double D_;
 
   public:
-    CalcMotions() : pnh_("~"), it_(nh_) {
+    CalcMotions() : pnh_("~"), it_(nh_), tf_listener_(tf_buf_) {
         vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
         state_pub_ = nh_.advertise<std_msgs::Int32>("machine_state", 1);
         image_sub_ = it_.subscribe("image_raw", 1, &CalcMotions::imageCb, this);
@@ -121,7 +130,7 @@ class CalcMotions {
 
             target_prev_ = target_;
             state_.transition();
-        } else {
+        } else if (state_.current() == MachineState::State::SEARCH_OBJ) {
             vel_msg_.linear.x = 0.0;
             vel_msg_.linear.y = 0.0;
             vel_msg_.linear.z = 0.0;
@@ -134,8 +143,86 @@ class CalcMotions {
     }
 
     void timerCb(const ros::TimerEvent &) {
+        using namespace MachineState;
+        if (state_.current() == State::HOLDING_OBJ && state_.prev() == State::SEARCH_OBJ) {
+            clock_ = ros::Time::now();
+        } else if (state_.current() == State::HOLDING_OBJ && state_.prev() == State::HOLDING_OBJ) {
+            if (ros::Time::now() - clock_ > ros::Duration(1.0)) {
+                state_.set_next(State::CARRY_OBJ);
+            }
+        } else if (state_.current() == State::CARRY_OBJ) {
+            calc_vel(std::string("goal_front"), State::INTO_GOAL, true);
+        } else if (state_.current() == State::INTO_GOAL) {
+            calc_vel(std::string("goal"), State::RELEASE_OBJ, true);
+        } else if (state_.current() == State::RELEASE_OBJ && state_.prev() == State::INTO_GOAL) {
+            clock_ = ros::Time::now();
+        } else if (state_.current() == State::RELEASE_OBJ && state_.prev() == State::RELEASE_OBJ) {
+            if (ros::Time::now() - clock_ > ros::Duration(1.0)) {
+                state_.set_next(State::EXIT_GOAL);
+            }
+        } else if (state_.current() == State::EXIT_GOAL) {
+            calc_vel(std::string("goal_front"), State::PREPARE, false);
+        } else if (state_.current() == State::PREPARE) {
+            geometry_msgs::TransformStamped tf_robot;
+            tf2::Stamped<tf2::Transform> tf_tmp;
+            try {
+                tf_robot = tf_buf_.lookupTransform("world", "base_link", ros::Time(0));
+            } catch (tf2::TransformException &ex) {
+                ROS_WARN("%s", ex.what());
+            }
+            double roll, pitch, yaw;
+            tf2::fromMsg(tf_robot, tf_tmp);
+            tf2::Quaternion q = tf_tmp.getRotation();
+            tf2::Matrix3x3(q).getEulerYPR(yaw, pitch, roll);
+            if (abs(yaw + M_PI / 2) < 0.1) {
+                state_.set_next(State::SEARCH_OBJ);
+            }
+            vel_msg_.linear.x = 0.0;
+            vel_msg_.linear.y = 0.0;
+            vel_msg_.linear.z = 0.0;
+            vel_msg_.angular.x = 0.0;
+            vel_msg_.angular.y = 0.0;
+            vel_msg_.angular.z = offset_vel_angular_;
+        }
+        state_.transition();
         vel_pub_.publish(vel_msg_);
         state_pub_.publish(state_.current_as_msg());
+    }
+
+    void calc_vel(const std::string tf_name, const MachineState::State next, bool forward) {
+        geometry_msgs::TransformStamped tf_target;
+        try {
+            tf_target = tf_buf_.lookupTransform("base_link", tf_name, ros::Time(0));
+        } catch (tf2::TransformException &ex) {
+            ROS_WARN("%s", ex.what());
+        }
+
+        double dist = sqrt(pow(tf_target.transform.translation.x, 2.0) + pow(tf_target.transform.translation.y, 2.0));
+        double vel_x = P_ * dist;
+        if (vel_x > offset_vel_linear_) {
+            vel_x = offset_vel_linear_;
+        }
+        double angle = atan2(tf_target.transform.translation.y, tf_target.transform.translation.x);
+
+        if (forward) {
+            angle = atan2(tf_target.transform.translation.y, tf_target.transform.translation.x);
+        } else {
+            angle = -atan2(tf_target.transform.translation.y, -tf_target.transform.translation.x);
+            vel_x = -vel_x;
+        }
+        if (abs(angle) > 0.1) {
+            vel_x = 0.0;
+        }
+        vel_msg_.linear.x = vel_x;
+        vel_msg_.linear.y = 0.0;
+        vel_msg_.linear.z = 0.0;
+        vel_msg_.angular.x = 0.0;
+        vel_msg_.angular.y = 0.0;
+        vel_msg_.angular.z = P_ * angle;
+
+        if (dist < 0.1) {
+            state_.set_next(next);
+        }
     }
 };
 

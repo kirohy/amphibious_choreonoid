@@ -47,8 +47,8 @@ class ThrustController : public cnoid::SimpleController {
         std::lock_guard<std::mutex> lock(cmd_mutex_);
         double x = msg->linear.x;
         double z = msg->angular.z;
-        thuruster_force_[0] = (x - z) * 10;
-        thuruster_force_[1] = (x + z) * 10;
+        thuruster_force_[0] = (x - z) * 20;
+        thuruster_force_[1] = (x + z) * 20;
     }
 };
 

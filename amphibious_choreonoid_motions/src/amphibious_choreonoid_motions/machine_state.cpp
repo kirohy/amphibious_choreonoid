@@ -62,8 +62,13 @@ namespace MachineState {
             res = State::INTO_GOAL;
             break;
         case 4:
+            res = State::RELEASE_OBJ;
+            break;
+        case 5:
             res = State::EXIT_GOAL;
             break;
+        case 6:
+            res = State::PREPARE;
         default:
             res = State::UNKNOWN;
             break;
@@ -71,7 +76,7 @@ namespace MachineState {
         return res;
     }
 
-    State from_msg(const std_msgs::Int32ConstPtr& msg) {
+    State from_msg(const std_msgs::Int32ConstPtr &msg) {
         return from_int(msg->data);
     }
 } // namespace MachineState

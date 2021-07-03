@@ -248,7 +248,7 @@ items:
               -1, 0, 0, 
               0, -1, 0, 
               0, 0, 1 ]
-            staticModel: false
+            staticModel: true
             collisionDetection: true
             selfCollisionDetection: false
             location_editable: true

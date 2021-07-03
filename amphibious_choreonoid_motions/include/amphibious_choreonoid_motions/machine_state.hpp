@@ -9,8 +9,10 @@ namespace MachineState {
         HOLDING_OBJ, // 1
         CARRY_OBJ,   // 2
         INTO_GOAL,   // 3
-        EXIT_GOAL,   // 4
-        UNKNOWN      //5
+        RELEASE_OBJ, // 4
+        EXIT_GOAL,   // 5
+        PREPARE,     // 6
+        UNKNOWN      // 7
     };
 
     class StateTransition {
@@ -41,7 +43,7 @@ namespace MachineState {
 
     State from_int(int state_int);
 
-    State from_msg(const std_msgs::Int32ConstPtr& msg);
+    State from_msg(const std_msgs::Int32ConstPtr &msg);
 } // namespace MachineState
 
 #endif // MACHINE_STATE_HPP
