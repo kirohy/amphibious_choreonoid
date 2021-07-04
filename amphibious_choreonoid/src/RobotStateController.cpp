@@ -51,7 +51,7 @@ class RobotStateController : public cnoid::SimpleController {
         auto start_time = ros::Time::now();
 
         static_tf.header.stamp = start_time;
-        static_tf.header.frame_id = "world";
+        static_tf.header.frame_id = "map";
         static_tf.child_frame_id = "goal";
         static_tf.transform.translation.x = goal_pos["x"];
         static_tf.transform.translation.y = goal_pos["y"];
@@ -65,7 +65,7 @@ class RobotStateController : public cnoid::SimpleController {
         static_tf_pub_.sendTransform(static_tf);
 
         static_tf.header.stamp = start_time;
-        static_tf.header.frame_id = "world";
+        static_tf.header.frame_id = "map";
         static_tf.child_frame_id = "goal_front";
         static_tf.transform.translation.x = goal_front_pos["x"];
         static_tf.transform.translation.y = goal_front_pos["y"];
@@ -80,7 +80,7 @@ class RobotStateController : public cnoid::SimpleController {
         auto pos = body_->rootLink()->T();
         Eigen::Quaterniond quat_robot(pos.rotation());
         static_tf.header.stamp = start_time;
-        static_tf.header.frame_id = "world";
+        static_tf.header.frame_id = "map";
         static_tf.child_frame_id = "initial_position";
         static_tf.transform.translation.x = pos.translation().x();
         static_tf.transform.translation.y = pos.translation().y();
@@ -112,7 +112,7 @@ class RobotStateController : public cnoid::SimpleController {
         Eigen::Quaterniond quat(pos.rotation());
         geometry_msgs::TransformStamped odom;
         odom.header.stamp = now;
-        odom.header.frame_id = "world";
+        odom.header.frame_id = "map";
         odom.child_frame_id = "base_link";
         odom.transform.translation.x = pos.translation().x();
         odom.transform.translation.y = pos.translation().y();

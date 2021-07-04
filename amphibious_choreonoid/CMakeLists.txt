@@ -15,7 +15,6 @@ find_package(catkin REQUIRED COMPONENTS
   tf2
   tf2_ros
   choreonoid
-  amphibious_choreonoid_motions
 )
 
 ## System dependencies are found with CMake's conventions

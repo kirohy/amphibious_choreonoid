@@ -1,0 +1,18 @@
+AmphibiousTank:
+  joint_list:
+    -
+      name: TURRET_Y
+      P: 200.0
+      D: 50.0
+    -
+      name: TURRET_P
+      P: 200.0
+      D: 50.0
+    -
+      name: ARM_L
+      P: 200.0
+      D: 50.0
+    -
+      name: ARM_R
+      P: 200.0
+      D: 50.0

@@ -7,6 +7,7 @@
 #include <opencv2/imgproc.hpp>
 #include <ros/ros.h>
 #include <sensor_msgs/image_encodings.h>
+#include <std_msgs/Float64MultiArray.h>
 #include <string>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_listener.h>
@@ -16,19 +17,28 @@ class CalcMotions {
     ros::NodeHandle nh_;
     ros::NodeHandle pnh_;
     ros::Publisher vel_pub_;
+    ros::Publisher joint_ref_pub_;
     ros::Publisher state_pub_;
     ros::Timer timer_;
     ros::Time clock_;
+
     geometry_msgs::Twist vel_msg_;
+    std::map<std::string, int> joint_list_;
+    std_msgs::Float64MultiArray joint_ref_msg_;
+    std::vector<double> joint_ref_;
+
     image_transport::ImageTransport it_;
     image_transport::Subscriber image_sub_;
     image_transport::Publisher image_pub_;
     cv_bridge::CvImagePtr cv_ptr_;
     cv::Point2f target_;
     cv::Point2f target_prev_;
+
     tf2_ros::Buffer tf_buf_;
     tf2_ros::TransformListener tf_listener_;
+
     MachineState::StateTransition state_;
+    std::string robot_name;
     int freq_;
     int fps_;
     double dt_;
@@ -42,6 +52,7 @@ class CalcMotions {
   public:
     CalcMotions() : pnh_("~"), it_(nh_), tf_listener_(tf_buf_) {
         vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+        joint_ref_pub_ = nh_.advertise<std_msgs::Float64MultiArray>("joint_ref", 1);
         state_pub_ = nh_.advertise<std_msgs::Int32>("machine_state", 1);
         image_sub_ = it_.subscribe("image_raw", 1, &CalcMotions::image_callback, this);
         image_pub_ = it_.advertise("image_result", 1);
@@ -54,7 +65,25 @@ class CalcMotions {
         pnh_.param("D_image", D_image_, 0.0);
         pnh_.param("P", P_, 200.0);
         pnh_.param("D", D_, 50.0);
+        pnh_.param("robot", robot_name, std::string("robot"));
         dt_ = 1.0 / freq_;
+
+        XmlRpc::XmlRpcValue robot_param;
+        pnh_.getParam(robot_name, robot_param);
+
+        if (robot_param["joint_list"].valid()) {
+            auto joint_list = robot_param["joint_list"];
+            joint_ref_.resize(joint_list.size());
+            joint_ref_msg_.data.resize(joint_list.size());
+            for (int i = 0; i < joint_list.size(); i++) {
+                joint_list_[static_cast<std::string>(joint_list[i]["name"])] = i;
+            }
+        }
+
+        joint_ref_msg_.data[joint_list_["TURRET_Y"]] = 0.0;
+        joint_ref_msg_.data[joint_list_["TURRET_P"]] = 0.0;
+        joint_ref_msg_.data[joint_list_["ARM_L"]] = 0.0;
+        joint_ref_msg_.data[joint_list_["ARM_R"]] = 0.0;
 
         vel_msg_.linear.x = 0.0;
         vel_msg_.linear.y = 0.0;
@@ -115,17 +144,10 @@ class CalcMotions {
                 if (max_area > cv_ptr_->image.cols * cv_ptr_->image.rows * 0.6) {
                     state_.set_next(MachineState::State::HOLDING_OBJ);
                 }
-            } else if (state_.current() == MachineState::State::HOLDING_OBJ) {
-                vel_msg_.linear.x = 0.0;
-                vel_msg_.linear.y = 0.0;
-                vel_msg_.linear.z = 0.0;
-                vel_msg_.angular.x = 0.0;
-                vel_msg_.angular.y = 0.0;
-                vel_msg_.angular.z = 0.0;
             }
 
             target_prev_ = target_;
-            state_.transition();
+            // state_.transition();
         } else if (state_.current() == MachineState::State::SEARCH_OBJ) {
             vel_msg_.linear.x = 0.0;
             vel_msg_.linear.y = 0.0;
@@ -140,22 +162,43 @@ class CalcMotions {
 
     void timer_callback(const ros::TimerEvent &) {
         using namespace MachineState;
+
+        static geometry_msgs::TransformStamped tf_robot;
+        try {
+            tf_robot = tf_buf_.lookupTransform("map", "base_link", ros::Time(0));
+            if (tf_robot.transform.translation.z >= 0.0) {
+                joint_ref_msg_.data[joint_list_["TURRET_P"]] = -15.0;
+            } else {
+                joint_ref_msg_.data[joint_list_["TURRET_P"]] = 0.0;
+            }
+        } catch (tf2::TransformException &ex) {
+            ROS_WARN("%s", ex.what());
+        }
+
         if (state_.current() == State::HOLDING_OBJ && state_.prev() == State::SEARCH_OBJ) {
             clock_ = ros::Time::now();
+            stop();
         } else if (state_.current() == State::HOLDING_OBJ && state_.prev() == State::HOLDING_OBJ) {
             if (ros::Time::now() - clock_ > ros::Duration(1.0)) {
                 state_.set_next(State::CARRY_OBJ);
             }
+            stop();
+            joint_ref_msg_.data[joint_list_["ARM_L"]] = 180.0;
+            joint_ref_msg_.data[joint_list_["ARM_R"]] = 180.0;
         } else if (state_.current() == State::CARRY_OBJ) {
             calc_vel(std::string("goal_front"), State::INTO_GOAL, true);
         } else if (state_.current() == State::INTO_GOAL) {
             calc_vel(std::string("goal"), State::RELEASE_OBJ, true);
         } else if (state_.current() == State::RELEASE_OBJ && state_.prev() == State::INTO_GOAL) {
             clock_ = ros::Time::now();
+            stop();
         } else if (state_.current() == State::RELEASE_OBJ && state_.prev() == State::RELEASE_OBJ) {
             if (ros::Time::now() - clock_ > ros::Duration(1.0)) {
                 state_.set_next(State::EXIT_GOAL);
             }
+            stop();
+            joint_ref_msg_.data[joint_list_["ARM_L"]] = 0.0;
+            joint_ref_msg_.data[joint_list_["ARM_R"]] = 0.0;
         } else if (state_.current() == State::EXIT_GOAL) {
             calc_vel(std::string("goal_front"), State::PREPARE, false);
         } else if (state_.current() == State::PREPARE) {
@@ -163,11 +206,12 @@ class CalcMotions {
         }
         state_.transition();
         vel_pub_.publish(vel_msg_);
+        joint_ref_pub_.publish(joint_ref_msg_);
         state_pub_.publish(state_.current_as_msg());
     }
 
     void calc_vel(const std::string tf_name, const MachineState::State next, bool forward) {
-        geometry_msgs::TransformStamped tf_target;
+        static geometry_msgs::TransformStamped tf_target;
         try {
             tf_target = tf_buf_.lookupTransform("base_link", tf_name, ros::Time(0));
         } catch (tf2::TransformException &ex) {
@@ -200,6 +244,15 @@ class CalcMotions {
         if (dist < 0.1) {
             state_.set_next(next);
         }
+    }
+
+    void stop() {
+        vel_msg_.linear.x = 0.0;
+        vel_msg_.linear.y = 0.0;
+        vel_msg_.linear.z = 0.0;
+        vel_msg_.angular.x = 0.0;
+        vel_msg_.angular.y = 0.0;
+        vel_msg_.angular.z = 0.0;
     }
 };
 

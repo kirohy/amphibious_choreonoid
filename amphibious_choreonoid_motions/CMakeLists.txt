@@ -8,9 +8,11 @@ project(amphibious_choreonoid_motions)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED
+  roscpp
   cv_bridge
   image_transport
   sensor_msgs
+  std_msgs
   tf2
   tf2_ros
 )
