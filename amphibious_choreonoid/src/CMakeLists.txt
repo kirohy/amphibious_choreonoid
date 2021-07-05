@@ -2,6 +2,7 @@ choreonoid_add_simple_controller(CameraController CameraController.cpp)
 target_link_libraries(CameraController ${roscpp_LIBRARIES} ${image_transport_LIBRARIES})
 
 choreonoid_add_simple_controller(JointController JointController.cpp)
+add_dependencies(JointController ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(JointController ${roscpp_LIBRARIES})
 
 choreonoid_add_simple_controller(RobotStateController RobotStateController.cpp)

@@ -9,8 +9,6 @@
   <group ns="$(arg robot0)">
     <node name="calc_motions" pkg="amphibious_choreonoid_motions" type="calc_motions" output="screen">
       <rosparam command="load" file="$(find amphibious_choreonoid_motions)/config/amphibious_tank.yaml" />
-      <rosparam command="load" file="$(find amphibious_choreonoid)/config/amphibious_tank_params.yaml" />
-      <param name="robot" value="$(arg robot0)" />
       <remap from="image_raw" to="camera/image" />
       <remap from="image_result" to="camera/image_result" />
     </node>

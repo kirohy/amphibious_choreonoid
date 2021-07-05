@@ -15,6 +15,7 @@ find_package(catkin REQUIRED
   std_msgs
   tf2
   tf2_ros
+  amphibious_choreonoid
 )
 
 ## System dependencies are found with CMake's conventions
@@ -144,7 +145,7 @@ add_library(MachineState
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/amphibious_choreonoid_motions_node.cpp)
-add_executable(calc_motions src/calc_motions.cpp)
+add_executable(calc_motions src/calc_motions_node.cpp src/calc_motions.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
